@@ -1,5 +1,5 @@
-# cryorithm-sensor-stock-fundamentals
-Cryorithm™ | Sensor | Stock Fundamentals
+# Cryorithm™ | Sensor | Stock Fundamentals
+`cryorithm-sensor-stock-fundamentals`
 
 ## Getting Started
 
