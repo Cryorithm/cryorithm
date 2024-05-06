@@ -24,6 +24,7 @@ Cryorithm™ | Kafka Client
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+import asyncio
 from confluent_kafka import Producer
 
 

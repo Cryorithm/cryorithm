@@ -34,10 +34,10 @@ import asyncio
 import click
 from pathlib import Path
 
-from config_manager import load_config
-from stock_sensor import StockSensor
-from openai_client import call_openai_api
-from kafka_client import send_to_kafka
+from cryorithm_sensor_stock_fundamentals.config_manager import load_config
+from cryorithm_sensor_stock_fundamentals.stock_sensor import StockSensor
+from cryorithm_sensor_stock_fundamentals.openai_client import call_openai_api
+from cryorithm_sensor_stock_fundamentals.kafka_client import send_to_kafka
 
 
 @click.command()
