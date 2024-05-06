@@ -20,6 +20,9 @@ pre-commit-hooks = "^4.6.0"
 pytest-coverage = "^0.0"
 flake8 = "^7.0.0"
 
+[tool.poetry.scripts]
+cryorithm-sensor-stock-fundamentals = "sensor.core:main"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
