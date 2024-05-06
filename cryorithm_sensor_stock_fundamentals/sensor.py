@@ -36,6 +36,7 @@ Cryorithm™ | Sensor | Stock Fundamentals
 # TODO: Make everything asyncio.
 # TODO: Use click but anticipate bugs that come from using asyncio.
 # TODO: Take config from yaml config (OR) command line (OR) environment variables, or mix and match with eval order of yaml overridden by environment variables overridden by command line. 
+# TODO: The config file that drives this sensor should live at ~/.config/cryorithm/config.yaml, and it should anticipate settings for sensors, as well as other system layers. And for sensors, it should have a key specific to this sensor only when necessary. E.g. OpenAI key should be centrally configured in that config.
 
 import json
 
