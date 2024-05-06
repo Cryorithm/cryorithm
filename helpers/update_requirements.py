@@ -1,6 +1,7 @@
 """
 Update requirements.txt
 """
+
 # MIT License
 #
 # Copyright © 2024 Joshua M. Dotson (contact@jmdots.com)
@@ -83,4 +84,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

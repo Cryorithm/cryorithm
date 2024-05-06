@@ -1,6 +1,7 @@
 """
 Cryorithm™ | Stock Sensor
 """
+
 # MIT License
 #
 # Copyright © 2024 Joshua M. Dotson (contact@jmdots.com)
@@ -24,6 +25,7 @@ Cryorithm™ | Stock Sensor
 # SOFTWARE.
 
 import yfinance as yf
+
 
 class StockSensor:
     def __init__(self, ticker_symbol):

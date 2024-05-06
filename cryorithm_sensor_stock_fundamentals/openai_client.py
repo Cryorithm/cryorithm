@@ -1,6 +1,7 @@
 """
 Cryorithm™ | OpenAI Client
 """
+
 # MIT License
 #
 # Copyright © 2024 Joshua M. Dotson (contact@jmdots.com)
@@ -26,6 +27,7 @@ Cryorithm™ | OpenAI Client
 import json
 import openai
 
+
 async def call_openai_api(data, api_key):
     client = openai.AsyncCompletion(api_key=api_key)
 
@@ -38,11 +40,11 @@ async def call_openai_api(data, api_key):
             top_p=0.9,
             frequency_penalty=0.5,
             presence_penalty=0.6,
-            stream=True
+            stream=True,
         )
-        
+
         async for chunk in response.iter_chunks():
-            print(chunk['choices'][0]['text'])
-            
+            print(chunk["choices"][0]["text"])
+
     except Exception as e:
         print(f"Error calling OpenAI API: {str(e)}")

@@ -1,6 +1,7 @@
 """
 Cryorithm™ | Config Manager
 """
+
 # MIT License
 #
 # Copyright © 2024 Joshua M. Dotson (contact@jmdots.com)
@@ -27,11 +28,12 @@ import os
 import yaml
 from pathlib import Path
 
+
 def load_config(path: Path) -> dict:
     default_config = {
-        'api_key': 'default-openai-key',
-        'kafka_bootstrap_servers': 'localhost:9092',
-        'kafka_topic': 'stock_sensor'
+        "api_key": "default-openai-key",
+        "kafka_bootstrap_servers": "localhost:9092",
+        "kafka_topic": "stock_sensor",
     }
 
     if path.exists():
@@ -40,8 +42,11 @@ def load_config(path: Path) -> dict:
             default_config.update(file_config)
 
     config_from_env = {
-        'api_key': os.getenv('OPENAI_API_KEY', default_config['api_key']),
-        'kafka_bootstrap_servers': os.getenv('KAFKA_BOOTSTRAP_SERVERS', default_config['kafka_bootstrap_servers'])
+        "api_key": os.getenv("OPENAI_API_KEY", default_config["api_key"]),
+        "kafka_bootstrap_servers": os.getenv(
+            "KAFKA_BOOTSTRAP_SERVERS",
+            default_config["kafka_bootstrap_servers"],
+        ),
     }
-    
+
     return config_from_env

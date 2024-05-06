@@ -1,6 +1,7 @@
 """
 Cryorithm™ | Kafka Client
 """
+
 # MIT License
 #
 # Copyright © 2024 Joshua M. Dotson (contact@jmdots.com)
@@ -25,8 +26,9 @@ Cryorithm™ | Kafka Client
 
 from confluent_kafka import Producer
 
-async def send_to_kafka(data, config):
-    producer = Producer({'bootstrap.servers': config['kafka_bootstrap_servers']})
 
-    producer.produce(config['kafka_topic'], value=data.encode('utf-8'))
+async def send_to_kafka(data, config):
+    producer = Producer({"bootstrap.servers": config["kafka_bootstrap_servers"]})
+
+    producer.produce(config["kafka_topic"], value=data.encode("utf-8"))
     producer.flush()

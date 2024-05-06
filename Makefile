@@ -1,8 +1,12 @@
 .PHONY: all $(shell grep '^[^#[:space:]].*:' Makefile | sed 's/:.*//')
 
+PKG ?= pytest
+
 help:
 	@echo "Usage: make <target>"
 	@echo "  help                 Show this help message"
+	@echo "  add                  Add a runtime package using Poetry (set $$PKG)"
+	@echo "  add-dev              Add a development package using Poetry (set $$PKG)"
 	@echo "  build                Build the package using Poetry"
 	@echo "  check                Perform all checks (linting, testing, and poetry integrity)"
 	@echo "  check-poetry         Run 'poetry check'"
@@ -17,6 +21,12 @@ help:
 	@echo "  update               Run 'poetry update' to update dependencies"
 	@echo "  update-poetry        Update Poetry to the latest version"
 	@echo "  update-requirements  Update the requirements.txt file"
+
+add:
+	poetry add $(PKG)
+
+add-dev:
+	poetry add $(PKG) --dev --group dev
 
 build:
 	poetry build

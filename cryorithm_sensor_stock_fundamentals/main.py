@@ -1,6 +1,7 @@
 """
 Cryorithm™ | Sensor | Stock Fundamentals
 """
+
 # MIT License
 #
 # Copyright © 2024 Joshua M. Dotson (contact@jmdots.com)
@@ -34,34 +35,43 @@ import click
 from pathlib import Path
 
 from config_manager import load_config
-from stock_sensor import StockSensor 
-from openai_client import call_openai_api 
+from stock_sensor import StockSensor
+from openai_client import call_openai_api
 from kafka_client import send_to_kafka
 
 
 @click.command()
-@click.option('--ticker', required=True, help="Ticker symbol for stock.")
-@click.option('--destination', type=click.Choice(['kafka', 'openai']), required=True,
-              help="Destination where the messages will be sent.")
-@click.option('--config-path', default='~/.config/cryorithm/config.yaml',
-              help="Path to configuration YAML file.")
+@click.option("--ticker", required=True, help="Ticker symbol for stock.")
+@click.option(
+    "--destination",
+    type=click.Choice(["kafka", "openai"]),
+    required=True,
+    help="Destination where the messages will be sent.",
+)
+@click.option(
+    "--config-path",
+    default="~/.config/cryorithm/config.yaml",
+    help="Path to configuration YAML file.",
+)
 def main(ticker, destination, config_path):
-   global config 
-   config = load_config(Path(config_path).expanduser())
-   
-   sensor = StockSensor(ticker)
-   
-   asyncio.run(job(sensor, destination))
+    global config
+    config = load_config(Path(config_path).expanduser())
 
-async def job(sensor: StockSensor , destination:str ):
-   data = await sensor.fetch_data()
-   if data is not None:  
-       if destination == "openai":
-           await call_openai_api(data, config['api_key'])
-       elif destination == "kafka":
-           await send_to_kafka(json.dumps(data), config)
-   else :
-       print("Failed to fetch data")
+    sensor = StockSensor(ticker)
+
+    asyncio.run(job(sensor, destination))
+
+
+async def job(sensor: StockSensor, destination: str):
+    data = await sensor.fetch_data()
+    if data is not None:
+        if destination == "openai":
+            await call_openai_api(data, config["api_key"])
+        elif destination == "kafka":
+            await send_to_kafka(json.dumps(data), config)
+    else:
+        print("Failed to fetch data")
+
 
 if __name__ == "__main__":
-   main()
+    main()
