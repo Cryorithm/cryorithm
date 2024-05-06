@@ -767,6 +767,22 @@ htmlsoup = ["BeautifulSoup4"]
 source = ["Cython (>=3.0.10)"]
 
 [[package]]
+name = "maison"
+version = "1.4.3"
+description = "Read settings from config files"
+optional = false
+python-versions = ">=3.7.1,<4.0.0"
+files = [
+    {file = "maison-1.4.3-py3-none-any.whl", hash = "sha256:a36208d0befb3bd8aa3b002ac198ce6f6e61efe568b195132640f4032eff46ac"},
+    {file = "maison-1.4.3.tar.gz", hash = "sha256:766222ce82ae27138256c4af9d0bc6b3226288349601e095dcc567884cf0ce36"},
+]
+
+[package.dependencies]
+click = ">=8.0.1,<9.0.0"
+pydantic = ">=2.5.3,<3.0.0"
+toml = ">=0.10.2,<0.11.0"
+
+[[package]]
 name = "mccabe"
 version = "0.7.0"
 description = "McCabe checker, plugin for flake8"
@@ -1452,6 +1468,24 @@ files = [
 ]
 
 [[package]]
+name = "ruyaml"
+version = "0.91.0"
+description = "ruyaml is a fork of ruamel.yaml"
+optional = false
+python-versions = ">=3.6"
+files = [
+    {file = "ruyaml-0.91.0-py3-none-any.whl", hash = "sha256:50e0ee3389c77ad340e209472e0effd41ae0275246df00cdad0a067532171755"},
+    {file = "ruyaml-0.91.0.tar.gz", hash = "sha256:6ce9de9f4d082d696d3bde264664d1bcdca8f5a9dff9d1a1f1a127969ab871ab"},
+]
+
+[package.dependencies]
+distro = ">=1.3.0"
+setuptools = ">=39.0"
+
+[package.extras]
+docs = ["Sphinx"]
+
+[[package]]
 name = "setuptools"
 version = "69.5.1"
 description = "Easily download, build, install, upgrade, and uninstall Python packages"
@@ -1498,6 +1532,17 @@ python-versions = ">=3.8"
 files = [
     {file = "soupsieve-2.5-py3-none-any.whl", hash = "sha256:eaa337ff55a1579b6549dc679565eac1e3d000563bcb1c8ab0d0fefbc0c2cdc7"},
     {file = "soupsieve-2.5.tar.gz", hash = "sha256:5663d5a7b3bfaeee0bc4372e7fc48f9cff4940b3eec54a6451cc5299f1097690"},
+]
+
+[[package]]
+name = "toml"
+version = "0.10.2"
+description = "Python Library for Tom's Obvious, Minimal Language"
+optional = false
+python-versions = ">=2.6, !=3.0.*, !=3.1.*, !=3.2.*"
+files = [
+    {file = "toml-0.10.2-py2.py3-none-any.whl", hash = "sha256:806143ae5bfb6a3c6e736a764057db0e6a0e05e338b5630894a5f779cabb4f9b"},
+    {file = "toml-0.10.2.tar.gz", hash = "sha256:b3bda1d108d5dd99f4a20d24d9c348e91c4db7ab1b749200bded2f839ccbe68f"},
 ]
 
 [[package]]
@@ -1602,6 +1647,22 @@ files = [
 ]
 
 [[package]]
+name = "yamlfix"
+version = "1.16.0"
+description = "A simple opionated yaml formatter that keeps your comments!"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "yamlfix-1.16.0-py3-none-any.whl", hash = "sha256:d92bf8a6d5b6f186bd9d643d633549a1c2424555cb8d176a5d38bce3e678b2b0"},
+    {file = "yamlfix-1.16.0.tar.gz", hash = "sha256:72f7990e5b2b4459ef3249df4724dacbd85ce7b87f4ea3503d8a72c48574cc32"},
+]
+
+[package.dependencies]
+click = ">=8.1.3"
+maison = ">=1.4.0"
+ruyaml = ">=0.91.0"
+
+[[package]]
 name = "yfinance"
 version = "0.2.38"
 description = "Download market data from Yahoo! Finance API"
@@ -1632,4 +1693,4 @@ repair = ["scipy (>=1.6.3)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "daca5bc5642b60e02bddc78f20e53e139021b46318a8102ede05c1d664ac342b"
+content-hash = "dafb3df25fd6486c9305bcc283a9b9fd6c77560a6a5aade36d26f3a6d15e2945"

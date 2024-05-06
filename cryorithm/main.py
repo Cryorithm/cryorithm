@@ -60,18 +60,21 @@ def main(ticker, destination, config_path):
 
 async def job(sensor: StockSensor, destination: str, config):
     data = await sensor.fetch_data()
-    
+
     if data:
         if destination == "openai":
             client_wrapper = cryo.openai.OpenAIClientWrapper(api_key=config["api_key"])
             async for message in client_wrapper.create_chat_completion_stream(
-                    model=config["model_name"], 
-                    messages=[{"role": "user", "content": data}]):  # Assuming 'data' is directly usable here; may need formatting.
-                print(message)  # Consider processing or further handling of the response.
-        
+                model=config["model_name"],
+                messages=[{"role": "user", "content": data}],
+            ):  # Assuming 'data' is directly usable here; may need formatting.
+                print(
+                    message,
+                )  # Consider processing or further handling of the response.
+
         elif destination == "kafka":
             await cryo.kafka.publish(json.dumps(data), config)
-    
+
     else:
         print("Failed to fetch data")
 

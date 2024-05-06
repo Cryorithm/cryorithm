@@ -1,6 +1,10 @@
-# Cryorithm™
+# Cryorithm™ - Platform for signal collection and analysis
 
-## Install from git repo (Ubuntu 22.04.4 LTS amd64)
+## Install from git repo (Windows 11, amd64)
+
+_COMING SOON_
+
+## Install from git repo (Ubuntu 22.04.4 LTS, amd64)
 
 If you choose to install from the git repo, you will need to set up your development
 environment to ensure everything functions correctly. Several `Makefile` commands can
@@ -75,9 +79,11 @@ _COMING SOON_
 ## License
 
 ```text
+Cryorithm™ - Platform for signal collection and analysis
+
 MIT License
 
-Copyright © 2024 Joshua M. Dotson (contact@jmdots.com)
+Copyright © 2024 Joshua M. Dotson (contact@cryorithm.org)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
