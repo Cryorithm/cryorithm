@@ -1,73 +1,76 @@
-# Cryorithm™ | Sensor | Stock Fundamentals
-`cryorithm-sensor-stock-fundamentals`
+# Cryorithm™
 
-## Install
+## Install from git repo (Ubuntu 22.04.4 LTS amd64)
 
-When you clone the repository onto a machine (we assume Ubuntu 22.04.4 LTS amd64 at the
-moment), you will need to set up your development environment to ensure everything
-functions correctly. Several Makefile commands can facilitate this process. Here's a
-step-by-step guide on what commands to run and in what order:
+If you choose to install from the git repo, you will need to set up your development
+environment to ensure everything functions correctly. Several `Makefile` commands can
+facilitate this process.
 
-### Step-by-Step Commands to Run After Cloning the Repo
+Here's a step-by-step guide on what commands to run and in what order:
 
-1. **Install Python**
-   Ensure Python is installed on your Ubuntu system. If not, you can install it along
-   with `pip` (Python’s package installer):
+### Step 1: Install Python
 
-   ```bash
-   sudo apt update
-   sudo apt install python3 python3-pip
-   ```
+Ensure Python is installed on your Ubuntu system. If not, you can install it along
+with `pip` (Python’s package installer):
 
-2. **Install Poetry**
-   Poetry is not typically included by default on Ubuntu, so you would need to install
-   it. You can do this by running the following command:
+```bash
+sudo apt update
+sudo apt install python3 python3-pip
+```
 
-   ```bash
-   curl -sSL \
-   https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py \
-   | python3 -
-   ```
+### Step 2: Install Poetry
 
-3. **Activate the Poetry environment**
+Poetry is not typically included by default on Ubuntu, so you would need to install
+it. You can do this by running the following command:
 
-   ```bash
-   make shell
-   ```
+```bash
+curl -sSL \
+https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py \
+| python3 -
+```
 
-4. **Install project dependencies**
+### Step 3: Activate the Poetry environment
 
-   ```bash
-   make install
-   ```
+```bash
+make shell
+```
 
-5. **Install Project Dependencies and Set Up the Environment**
-   This can typically be achieved by running `poetry install`, but since we use a
-   `Makefile`, the process can be initiated by:
+### Step 4: Install project dependencies
 
-   ```bash
-   make update
-   ```
+```bash
+make install
+```
 
-6. **Install Pre-commit Hooks**
-   After installing the pre-commit package, install the actual hooks configured for the
-   project:
+### Step 5: Install Project Dependencies and Set Up the Environment
 
-   ```bash
-   make install-precommit
-   ```
+This can typically be achieved by running `poetry install`, but since we use a
+`Makefile`, the process can be initiated by:
 
-7. **Run Initial Checks**
-   To ensure everything is configured correctly (e.g., linters, formatters, and tests),
-   run:
+```bash
+make update
+```
 
-   ```bash
-   make check
-   ```
+### Step 6: Install Pre-commit Hooks
+
+After installing the pre-commit package, install the actual hooks configured for the
+project:
+
+```bash
+make install-precommit
+```
+
+### Step 7: Run Initial Checks
+To ensure everything is configured correctly (e.g., linters, formatters, and tests),
+run:
+
+```bash
+make check
+```
 
 ## Usage
 
 _COMING SOON_
+
 
 ## License
 

@@ -1,7 +1,7 @@
 [tool.poetry]
-name = "cryorithm-sensor-stock-fundamentals"
+name = "cryorithm"
 version = "0.1.0"
-description = "Cryorithm™ | Sensor | Stock Fundamentals"
+description = "Cryorithm™"
 authors = ["Joshua M. Dotson <contact@jmdots.com>"]
 license = "MIT"
 readme = "README.md"
@@ -22,7 +22,7 @@ pytest-coverage = "^0.0"
 flake8 = "^7.0.0"
 
 [tool.poetry.scripts]
-cryorithm-sensor-stock-fundamentals = "cryorithm_sensor_stock_fundamentals.main:main"
+cryorithm = "cryorithm.cli:main"
 
 [build-system]
 requires = ["poetry-core"]

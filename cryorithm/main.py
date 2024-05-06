@@ -1,5 +1,5 @@
 """
-Cryorithm™ | Sensor | Stock Fundamentals
+Cryorithm™ | CLI
 """
 
 # MIT License
@@ -24,20 +24,19 @@ Cryorithm™ | Sensor | Stock Fundamentals
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+# TODO: Move to a Poetry mono repo for the v1 architecture.
 # TODO: Take a cron-style schedule and use it to orchestrate the triggering of
 #       pull->push of stock fundamentals.
 # TODO: Instead of printing, output structured logs.
 # TODO: Craft a json schema for the sensor status message sent onward to OpenAI and/or Kafka. Should be the same message regardless of destination (for now).
-# TODO: Make everything asyncio.
 
 import asyncio
-import click
+import json
 from pathlib import Path
 
-from cryorithm_sensor_stock_fundamentals.config_manager import load_config
-from cryorithm_sensor_stock_fundamentals.stock_sensor import StockSensor
-from cryorithm_sensor_stock_fundamentals.openai_client import call_openai_api
-from cryorithm_sensor_stock_fundamentals.kafka_client import send_to_kafka
+import click
+
+import cryorithm as cryo
 
 
 @click.command()
@@ -54,21 +53,25 @@ from cryorithm_sensor_stock_fundamentals.kafka_client import send_to_kafka
     help="Path to configuration YAML file.",
 )
 def main(ticker, destination, config_path):
-    global config
-    config = load_config(Path(config_path).expanduser())
-
-    sensor = StockSensor(ticker)
-
-    asyncio.run(job(sensor, destination))
+    config = cryo.config.load(Path(config_path).expanduser())
+    sensor = cryo.sensor.stock.fundamentals.Sensor(ticker)
+    asyncio.run(job(sensor, destination, config))
 
 
-async def job(sensor: StockSensor, destination: str):
+async def job(sensor: StockSensor, destination: str, config):
     data = await sensor.fetch_data()
-    if data is not None:
+    
+    if data:
         if destination == "openai":
-            await call_openai_api(data, config["api_key"])
+            client_wrapper = cryo.openai.OpenAIClientWrapper(api_key=config["api_key"])
+            async for message in client_wrapper.create_chat_completion_stream(
+                    model=config["model_name"], 
+                    messages=[{"role": "user", "content": data}]):  # Assuming 'data' is directly usable here; may need formatting.
+                print(message)  # Consider processing or further handling of the response.
+        
         elif destination == "kafka":
-            await send_to_kafka(json.dumps(data), config)
+            await cryo.kafka.publish(json.dumps(data), config)
+    
     else:
         print("Failed to fetch data")
 
