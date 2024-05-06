@@ -1,10 +1,73 @@
 # Cryorithm™ | Sensor | Stock Fundamentals
 `cryorithm-sensor-stock-fundamentals`
 
-## Getting Started
+## Install
+
+When you clone the repository onto a machine (we assume Ubuntu 22.04.4 LTS amd64 at the
+moment), you will need to set up your development environment to ensure everything
+functions correctly. Several Makefile commands can facilitate this process. Here's a
+step-by-step guide on what commands to run and in what order:
+
+### Step-by-Step Commands to Run After Cloning the Repo
+
+1. **Install Python**
+   Ensure Python is installed on your Ubuntu system. If not, you can install it along
+   with `pip` (Python’s package installer):
+
+   ```bash
+   sudo apt update
+   sudo apt install python3 python3-pip
+   ```
+
+2. **Install Poetry**
+   Poetry is not typically included by default on Ubuntu, so you would need to install
+   it. You can do this by running the following command:
+
+   ```bash
+   curl -sSL \
+   https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py \
+   | python3 -
+   ```
+
+3. **Activate the Poetry environment**
+
+   ```bash
+   make shell
+   ```
+
+4. **Install project dependencies**
+
+   ```bash
+   make install
+   ```
+
+5. **Install Project Dependencies and Set Up the Environment**
+   This can typically be achieved by running `poetry install`, but since we use a
+   `Makefile`, the process can be initiated by:
+
+   ```bash
+   make update
+   ```
+
+6. **Install Pre-commit Hooks**
+   After installing the pre-commit package, install the actual hooks configured for the
+   project:
+
+   ```bash
+   make install-precommit
+   ```
+
+7. **Run Initial Checks**
+   To ensure everything is configured correctly (e.g., linters, formatters, and tests),
+   run:
+
+   ```bash
+   make check
+   ```
+
+## Usage
 
 _COMING SOON_
-
 
 ## License
 
