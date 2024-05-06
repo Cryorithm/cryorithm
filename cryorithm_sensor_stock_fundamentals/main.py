@@ -23,34 +23,45 @@ Cryorithm™ | Sensor | Stock Fundamentals
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-# TODO: Make everything object oriented with factories that are easy to test and inuit about.
-# TODO: Abstract yfinance out such that we can replace it very easily someday or make the source of data selectable.
-# TODO: Work with any desired yfinance-supported ticker symbol.
-# TODO: Implement a CLI flags to enable the sensor to post its messages to OpenAI API for summary and analysis. Include a natural language prompt requesting summary and analysis in the standard message, regardless of destination being OpenAI or Kafka.
-# TODO: Implement a CLI flags to enable the sensor to post its messages to Kafka.
-# TODO: Take the ticker symbol from a CLI flag.
 # TODO: Take a cron-style schedule and use it to orchestrate the triggering of
 #       pull->push of stock fundamentals.
 # TODO: Instead of printing, output structured logs.
 # TODO: Craft a json schema for the sensor status message sent onward to OpenAI and/or Kafka. Should be the same message regardless of destination (for now).
 # TODO: Make everything asyncio.
-# TODO: Use click but anticipate bugs that come from using asyncio.
-# TODO: Take config from yaml config (OR) command line (OR) environment variables, or mix and match with eval order of yaml overridden by environment variables overridden by command line. 
-# TODO: The config file that drives this sensor should live at ~/.config/cryorithm/config.yaml, and it should anticipate settings for sensors, as well as other system layers. And for sensors, it should have a key specific to this sensor only when necessary. E.g. OpenAI key should be centrally configured in that config.
 
-import json
+import asyncio
+import click
+from pathlib import Path
 
-import openai
-import yfinance as yf
+from config_manager import load_config
+from stock_sensor import StockSensor 
+from openai_client import call_openai_api 
+from kafka_client import send_to_kafka
 
-# Fetch data for Ford Motor Company
-ford_stock = yf.Ticker("F")
 
-# Get stock info
-info = ford_stock.info
+@click.command()
+@click.option('--ticker', required=True, help="Ticker symbol for stock.")
+@click.option('--destination', type=click.Choice(['kafka', 'openai']), required=True,
+              help="Destination where the messages will be sent.")
+@click.option('--config-path', default='~/.config/cryorithm/config.yaml',
+              help="Path to configuration YAML file.")
+def main(ticker, destination, config_path):
+   global config 
+   config = load_config(Path(config_path).expanduser())
+   
+   sensor = StockSensor(ticker)
+   
+   asyncio.run(job(sensor, destination))
 
-# Convert to JSON
-info_json = json.dumps(info, indent=4)
+async def job(sensor: StockSensor , destination:str ):
+   data = await sensor.fetch_data()
+   if data is not None:  
+       if destination == "openai":
+           await call_openai_api(data, config['api_key'])
+       elif destination == "kafka":
+           await send_to_kafka(json.dumps(data), config)
+   else :
+       print("Failed to fetch data")
 
-# Print JSON output.
-print(info_json)
+if __name__ == "__main__":
+   main()

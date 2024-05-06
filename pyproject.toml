@@ -21,7 +21,7 @@ pytest-coverage = "^0.0"
 flake8 = "^7.0.0"
 
 [tool.poetry.scripts]
-cryorithm-sensor-stock-fundamentals = "sensor.core:main"
+cryorithm-sensor-stock-fundamentals = "cryorithm_sensor_stock_fundamentals.main:main"
 
 [build-system]
 requires = ["poetry-core"]
