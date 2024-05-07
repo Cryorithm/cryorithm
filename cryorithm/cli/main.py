@@ -25,8 +25,11 @@ Cryorithm™ | CLI | Main
 
 # TODO: Take a cron-style schedule and use it to orchestrate the triggering of
 #       pull->push of stock fundamentals.
-# TODO: Instead of printing, output structured logs.
+# TODO: Instead of printing, output structured logs. Add a LogManager that natively handles structured logging.
 # TODO: Craft a json schema for the sensor status message sent onward to OpenAI and/or Kafka. Should be the same message regardless of destination (for now).
+# TODO: Ensure the help text gives accurate first and second level defaults. (see: topic -> ticker)
+# TODO: Allow override of default log file location via Click. 
+
 
 import asyncio
 import json
@@ -38,96 +41,68 @@ import click
 from cryorithm.clients.kafka import KafkaClientWrapper
 from cryorithm.clients.openai import OpenAIClientWrapper
 from cryorithm.managers.config import ConfigManager
+from cryorithm.managers.log import LogManager
 from cryorithm.sensors.stock.fundamentals import StockFundamentalsSensor
 
-DEFAULT_CONFIG                  = '~/.config/cryorithm/config.yaml'
-DEFAULT_TICKER                  = 'DASH'  # Doordash
-DEFAULT_DESTINATION             = 'log'
-DEFAULT_KAFKA_BOOTSTRAP_SERVERS = 'localhost:9902'
-DEFAULT_KAFKA_TOPIC             = 'cryorithm'
+@click.command()
+@click.option('--config-path',
+        type=click.Path(),
+        default='~/.config/cryorithm/config.yaml',
+        show_default=True,
+        envvar='CRYORITHM_CONFIG_PATH',
+        help='Path to the configuration YAML file.')  
+@click.option('--ticker',
+        help='Stock ticker symbol.')
+@click.option('--destination',
+        type=click.Choice(['kafka', 'log', 'openai']),
+        help='Destination system where signals will be sent.')
+@click.option('--kafka-bootstrap-servers',
+        help='Kafka bootstrap servers connection string.')
+@click.option('--kafka-topic',
+        help='Kafka topic where signals are sent.')
+def main(config_path, ticker, destination, kafka_bootstrap_servers, kafka_topic):
 
-@click.option(
-    '--config',
-    type=click.Path(exists=True),
-    envvar='CRYORITHM_CONFIG',
-    default=DEFAULT_CONFIG,
-    help=f"""Path to the configuration YAML file. Can also be set via CRYORITHM_CONFIG
-    environment variable. If neither flag nor environment variable is set, default
-    value is: {DEFAULT_CONFIG}""",
-)
-@click.option(
-    '--ticker',
-    envvar='CRYORITHM_TICKER',
-    default=DEFAULT_TICKER,
-    help=f"""Stock ticker symbol. Can also be set via CRYORITHM_TICKER environment
-    variable. If neither flag nor environment variable is set, default value is:
-    {DEFAULT_TICKER}""",
-)
-@click.option(
-    '--destination',
-    type=click.Choice(['kafka', 'log', 'openai']),
-    envvar='CRYORITHM_DESTINATION',
-    default=DEFAULT_DESTINATION,
-    help=f"""Destination system where signals will be sent. Can also be set via
-    CRYORITHM_DESTINATION environment variable. If neither flag nor environment
-    variable is set, default value is: {DEFAULT_DESTINATION}""",
-)
-@click.option(
-    '--kafka-bootstrap-servers',
-    type=click.Choice(['kafka', 'log', 'openai']),
-    envvar='CRYORITHM_DESTINATION',
-    default=DEFAULT_KAFKA_BOOTSTRAP_SERVERS,
+    # Initialize config manager
+    conf_manager = ConfigManager()
 
-    help=f"""(comma-separated list of host:port): This argument specifies a
-    comma-separated list of host and port pairs of the Kafka brokers in the cluster.
-    The client will initially connect to these bootstrap servers to discover the full
-    set of brokers in the cluster. You can specify multiple bootstrap servers to
-    provide redundancy in case one server is unavailable. Can also be set via
-    CRYORITHM_KAFKA_BOOTSTRAP_SERVERS envrionment variable. If neither flag nor
-    environment variable is set, default value is:
-    {DEFAULT_KAFKA_BOOTSTRAP_SERVERS}""",
-)
-@click.option(
-    '--kafka-topic',
-    default=lambda ctx: ctx.params.get('ticker'),
-    help=f"""Kafka topic where signals are sent, if "kafka" is the destination.
-    Defaults to the final value of ticker if ticker is set. If ticker is not set,
-    the default value is: {DEFAULT_KAFKA_TOPIC}""",
-    callback=lambda ctx, param, value: value if value else DEFAULT_KAFKA_TOPIC,
-)
-default main(args):
+    # Initialize log manager
+    log_manager.info("Application started", event="startup")
+    log_manager = LogManager(log_level="INFO", log_file="cryorithm.log")
+    log_manager = LogManager(log_config)
 
 
-    # By this time, the following config layers have been handled:
-    # 1. Static Defaults
-    # 2. Environment Variables
-    # 3. CLI Flags
+"""EXAMPLES
 
-    # So how do I 
+    # Demonstrate logging
+    log_manager.info("Application started")
+    log_manager.warning("This is a warning")
+    log_manager.error("An error occurred")
+    log_manager.critical("Critical issue")
 
+    try:
+        # Your application logic here
+        log_manager.debug("Processing data: %s", data)
+    except Exception as e:
+        log_manager.error("An error occurred: %s", e)
+"""
 
-    config_manager = ConfigManger()
-    config_manager.load_yaml('???')
-    config.load_env_vars()
-
-
-
-def main(ticker, destination, config_path):
-    config = ConfigManager()
-    config.load_yaml(
-
-
-
-    # Initialize config
-    cli_options_config = {
-        'config_path': Path(config_path).expandus:er()
+    # Load configurations in predefined order
+    conf_manager.load_yaml(config_path)
+    conf_manager.load_env_vars()
+    
+    # Prepare CLI arguments before passing them to update_from_cli
+    cli_args = {
+        'ticker': ticker,
         'destination': destination,
         'kafka_bootstrap_servers': kafka_bootstrap_servers,
-        'kafka_topic': kafka_topic,
-        'ticker': ticker,
+        'kafka_topic': kafka_topic
     }
-    config_manager = ConfigManager(Path(config_path).expandus:er(), ticker, destination)
-    config = config_manager.get()
+    
+    conf_manager.update_from_cli(cli_args)
+    config = conf_manager.get_config()  # Returns the final version of the config.
+   
+    # TODO: Structured log output the config here, but mask the OpenAI API Key.
+    print(config)
 
     # Initialize sensors
     stock_fundamentals_sensor = StockFundamentalsSensor(ticker)
@@ -144,7 +119,7 @@ async def job(sensor: StockSensor, destination: str, config):
 
     if data:
         if destination == "openai":
-            openai_client_wrapper = OpenAIClientWrapper(api_key=config["api_key"])
+            openai_client_wrapper = OpenAIClientWrapper(api_key=config[["openai"]["api_key"])
             async for message in client_wrapper.create_chat_completion_stream(
                 model=config["model_name"],
                 messages=[{"role": "user", "content": data}],

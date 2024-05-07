@@ -27,69 +27,42 @@ import os
 import yaml
 from pathlib import Path
 
-
-class Config:
-    """
-    Manages configuration settings for an application.
-    
-    This class loads configuration data from a specified YAML file and environment variables,
-    providing a centralized access point for configuration settings.
-
-    Layering happens in this order (last wins):
-    1. Default Config
-    2. YAML File Config
-    3. Environment Variables Config
-    3. CLI Options Config
-    
-    Attributes:
-        path (Path): The path to the configuration file.
-        data (dict): The loaded configuration data.
-    """
-    def __init__(self, path: str, ticker: str, destination: str, kafka_bootstrap_servers: str, kafka_topic: str):
-        """
-        Initializes a new instance of the Config class.
-        
-        Args:
-            path (str): File path of the YAML configuration file.
-            ticker (str): Ticker symbol for the stock.
-            destination (str): Desination where signals will be sent.
-        """
-        self.path = Path(path)
-        self.ticker = ticker
-        self.destination = destination
-        self.data = self._load()
-
-    def _load(self) -> dict:
-        """
-        Private method to load configuration from a file and environment variables.
-        
-        Returns the configuration with environment variables overriding the file settings where applicable.
-        """
-        # Default configuration settings
-        default_config = {
-            "api_key": "default-openai-key",
-            "kafka_bootstrap_servers": kafka_bootstrap_servers,
-            "kafka_topic": ticker,
+class ConfigManager:
+    def __init__(self):
+        # Initialize with default settings except for 'api_key' since it should only come from config file.
+        self.config = {
+            "kafka_bootstrap_servers": "localhost:9902",
+            "kafka_topic": "cryorithm",
+            "ticker": "DASH",
+            "destination": "log"
         }
+    
+    def load_yaml(self, path):
+        resolved_path = Path(path).expanduser()
+        try:
+            with resolved_path.open('r') as f:
+                config_data = yaml.safe_load(f)
+                if config_data:
+                    self.config.update(config_data)  # Update all config values including api_key from file.
+        except FileNotFoundError:
+            print("YAML configuration file not found at", resolved_path, ". Using defaults.")
+        except yaml.YAMLError as exc:
+            print("Error parsing YAML file:", exc)
 
-        # Load and update from YAML file if it exists
-        if self.path.exists():
-            with self.path.open() as file:
-                config_data = yaml.safe_load(file)
-                defaults.update(config_data)
+    def load_env_vars(self):
+        # Load environment variables but exclude 'api_key'
+        env_keys = ["kafka_bootstrap_servers", "kafka_topic", "ticker", "destination"]
+        for key in env_keys:
+            env_value = os.getenv(f'CRYORITHM_{key.upper()}')
+            if env_value:
+                self.config[key] = env_value
 
-        # Environment variable overrides
-        env_config = {
-            "api_key": os.getenv("OPENAI_API_KEY", defaults["api_key"]),
-            "kafka_bootstrap_servers": os.getenv("KAFKA_BOOTSTRAP_SERVERS", defaults["kafka_bootstrap_servers"]),
-        }
-        return env_config
-
-    def get(self) -> dict:
-        """
-        Retrieves the loaded configuration data.
+    def update_from_cli(self, cli_args):
+        # Update configuration from CLI arguments excluding 'api_key'
+        allowed_cli_keys = ['ticker', 'destination', 'kafka_bootstrap_servers', 'kafka_topic']
+        filtered_cli_args = {k: v for k, v in cli_args.items() if k in allowed_cli_keys and v is not None}
         
-        Returns:
-            dict: The configuration data as a dictionary.
-        """
-        return self.data
+        self.config.update(filtered_cli_args)
+
+    def get_config(self):
+        return self.config
