@@ -1,5 +1,5 @@
 """
-Cryorithm™ | OpenAI Client
+Cryorithm™ | Sensors | Stock | Fundamentals
 """
 
 # MIT License
@@ -25,27 +25,14 @@ Cryorithm™ | OpenAI Client
 # SOFTWARE.
 
 import asyncio
-import json
-import openai
+import yfinance as yf
 
 
-async def call_openai_api(data, api_key):
-    client = openai.AsyncCompletion(api_key=api_key)
+class StockSensor:
+    def __init__(self, ticker_symbol):
+        self.ticker = ticker_symbol
 
-    try:
-        response = await client.create(
-            model="gpt-4-turbo",
-            messages=[{"role": "system", "content": json.dumps(data)}],
-            max_tokens=512,
-            temperature=1.0,
-            top_p=0.9,
-            frequency_penalty=0.5,
-            presence_penalty=0.6,
-            stream=True,
-        )
-
-        async for chunk in response.iter_chunks():
-            print(chunk["choices"][0]["text"])
-
-    except Exception as e:
-        print(f"Error calling OpenAI API: {str(e)}")
+    async def fetch_data(self):
+        loop = asyncio.get_event_loop()
+        info = await loop.run_in_executor(None, lambda: yf.Ticker(self.ticker).info)
+        return info
