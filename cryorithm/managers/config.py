@@ -1,6 +1,7 @@
 """
 Cryorithm™ | Managers | Config
 """
+
 # MIT License
 #
 # Copyright © 2024 Joshua M. Dotson (contact@jmdots.com)
@@ -27,6 +28,7 @@ import os
 import yaml
 from pathlib import Path
 
+
 class ConfigManager:
     def __init__(self):
         # Initialize with default settings except for 'api_key' since it should only come from config file.
@@ -34,18 +36,24 @@ class ConfigManager:
             "kafka_bootstrap_servers": "localhost:9902",
             "kafka_topic": "cryorithm",
             "ticker": "DASH",
-            "destination": "log"
+            "destination": "log",
         }
-    
+
     def load_yaml(self, path):
         resolved_path = Path(path).expanduser()
         try:
-            with resolved_path.open('r') as f:
+            with resolved_path.open("r") as f:
                 config_data = yaml.safe_load(f)
                 if config_data:
-                    self.config.update(config_data)  # Update all config values including api_key from file.
+                    self.config.update(
+                        config_data,
+                    )  # Update all config values including api_key from file.
         except FileNotFoundError:
-            print("YAML configuration file not found at", resolved_path, ". Using defaults.")
+            print(
+                "YAML configuration file not found at",
+                resolved_path,
+                ". Using defaults.",
+            )
         except yaml.YAMLError as exc:
             print("Error parsing YAML file:", exc)
 
@@ -53,15 +61,22 @@ class ConfigManager:
         # Load environment variables but exclude 'api_key'
         env_keys = ["kafka_bootstrap_servers", "kafka_topic", "ticker", "destination"]
         for key in env_keys:
-            env_value = os.getenv(f'CRYORITHM_{key.upper()}')
+            env_value = os.getenv(f"CRYORITHM_{key.upper()}")
             if env_value:
                 self.config[key] = env_value
 
     def update_from_cli(self, cli_args):
         # Update configuration from CLI arguments excluding 'api_key'
-        allowed_cli_keys = ['ticker', 'destination', 'kafka_bootstrap_servers', 'kafka_topic']
-        filtered_cli_args = {k: v for k, v in cli_args.items() if k in allowed_cli_keys and v is not None}
-        
+        allowed_cli_keys = [
+            "ticker",
+            "destination",
+            "kafka_bootstrap_servers",
+            "kafka_topic",
+        ]
+        filtered_cli_args = {
+            k: v for k, v in cli_args.items() if k in allowed_cli_keys and v is not None
+        }
+
         self.config.update(filtered_cli_args)
 
     def get_config(self):

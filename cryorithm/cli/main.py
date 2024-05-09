@@ -28,7 +28,7 @@ Cryorithm™ | CLI | Main
 # TODO: Instead of printing, output structured logs. Add a LogManager that natively handles structured logging.
 # TODO: Craft a json schema for the sensor status message sent onward to OpenAI and/or Kafka. Should be the same message regardless of destination (for now).
 # TODO: Ensure the help text gives accurate first and second level defaults. (see: topic -> ticker)
-# TODO: Allow override of default log file location via Click. 
+# TODO: Allow override of default log file location via Click.
 
 
 import asyncio
@@ -50,7 +50,24 @@ from cryorithm.sensors.stock.fundamentals import StockFundamentalsSensor
         default='~/.config/cryorithm/config.yaml',
         show_default=True,
         envvar='CRYORITHM_CONFIG_PATH',
-        help='Path to the configuration YAML file.')  
+        help='Path to the configuration YAML file.')
+@click.option('--log-path',
+        type=click.Path(),
+        default='cryorithm.log',
+        show_default=True,
+        envvar='CRYORITHM_LOG_PATH',
+        help='Path to the log file.')
+@click.option('--log-level',
+        type=click.Choice(['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'], case_sensitive=False),
+        default='DEBUG',
+        show_default=True,
+        envvar='CRYORITHM_LOG_LEVEL',
+        help='Log level (case-insensitive).')
+@click.option('--log-rotation',
+        default='10 MB',
+        show_default=True,
+        envvar='CRYORITHM_LOG_ROTATION',
+        help=' Log rotation configuration for the log file.'),
 @click.option('--ticker',
         help='Stock ticker symbol.')
 @click.option('--destination',
@@ -60,36 +77,21 @@ from cryorithm.sensors.stock.fundamentals import StockFundamentalsSensor
         help='Kafka bootstrap servers connection string.')
 @click.option('--kafka-topic',
         help='Kafka topic where signals are sent.')
-def main(config_path, ticker, destination, kafka_bootstrap_servers, kafka_topic):
+def main(config_path, log_path, log_level, log_rotation, ticker, destination,
+        kafka_bootstrap_servers, kafka_topic):
 
-    # Initialize config manager
-    conf_manager = ConfigManager()
+    # Initialize LogManager
+    log_manager = LogManager(sink=log_path, level=log_level, rotation=log_rotation)
+    log_manager.info('Application started', event='startup')
+    log_manager.info(f"Log level set to {log_level}")
 
-    # Initialize log manager
-    log_manager.info("Application started", event="startup")
-    log_manager = LogManager(log_level="INFO", log_file="cryorithm.log")
-    log_manager = LogManager(log_config)
-
-
-"""EXAMPLES
-
-    # Demonstrate logging
-    log_manager.info("Application started")
-    log_manager.warning("This is a warning")
-    log_manager.error("An error occurred")
-    log_manager.critical("Critical issue")
-
-    try:
-        # Your application logic here
-        log_manager.debug("Processing data: %s", data)
-    except Exception as e:
-        log_manager.error("An error occurred: %s", e)
-"""
+    # Initialize ConfigManager
+    config_manager = ConfigManager()
 
     # Load configurations in predefined order
-    conf_manager.load_yaml(config_path)
-    conf_manager.load_env_vars()
-    
+    config_manager.load_yaml(config_path)
+    config_manager.load_env_vars()
+
     # Prepare CLI arguments before passing them to update_from_cli
     cli_args = {
         'ticker': ticker,
@@ -97,12 +99,9 @@ def main(config_path, ticker, destination, kafka_bootstrap_servers, kafka_topic)
         'kafka_bootstrap_servers': kafka_bootstrap_servers,
         'kafka_topic': kafka_topic
     }
-    
-    conf_manager.update_from_cli(cli_args)
+    config_manager.update_from_cli(cli_args)
     config = conf_manager.get_config()  # Returns the final version of the config.
-   
-    # TODO: Structured log output the config here, but mask the OpenAI API Key.
-    print(config)
+    log_manager.info('ConfigManager activated.', extra=config, event='startup')
 
     # Initialize sensors
     stock_fundamentals_sensor = StockFundamentalsSensor(ticker)

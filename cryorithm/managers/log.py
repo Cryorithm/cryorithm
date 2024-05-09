@@ -1,6 +1,7 @@
 """
 Cryorithm™ | Managers | Log
 """
+
 # MIT License
 #
 # Copyright © 2024 Joshua M. Dotson (contact@jmdots.com)
@@ -25,20 +26,40 @@ Cryorithm™ | Managers | Log
 
 from loguru import logger
 
+
 class LogManager:
-    def __init__(self, log_level="DEBUG", log_file=None, rotation="10 MB"):
+    def __init__(self, sink=None, level="DEBUG", rotation="10 MB"):
         """
         Initializes the LogManager with logging configuration.
 
         Args:
-            log_level (str, optional): Logging level (default: DEBUG).
-            log_file (str, optional): Path to a log file (default: None).
-            rotation (str, optional): Log rotation configuration for the log file (default: "10 MB").
+            sink (str, optional): An object, such as a pathlib.Path, in charge of
+                receiving formatted logging messages and propagating them to an
+                appropriate endpoint (see loguru.logger) (default: None)'
+            level (str, optional): Logging level (default: 'DEBUG').
+            rotation (str, optional): Log rotation configuration for the log file
+                (default: '10 MB').
         """
-        if log_file:
-            logger.add(log_file, level=log_level, rotation=rotation)
+        self.level = (level,)
+        self._sink = sink  # Use _ for private attributes
+        self._rotation = rotation
+
+        if self._sink:
+            logger.add(sink=self._sink, level=self.level, rotation=self._rotation)
         else:
-            logger.add(level=log_level)
+            logger.add(level=self.level)
+
+        logger.info("LogManager activated.", extra=self.get_config(), event="startup")
+
+    def get_config(self):
+        """
+        Returns a dictionary containing the currently applied configuration.
+        """
+        return {
+            "level": self.level,
+            "sink": self._sink,
+            "rotation": self._rotation,
+        }
 
     def debug(self, message, *args, **kwargs):
         """Logs a debug message."""
