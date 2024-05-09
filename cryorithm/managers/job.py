@@ -1,6 +1,7 @@
 """
 Cryorithm™ | Managers | Job
 """
+
 # MIT License
 #
 # Copyright © 2024 Joshua M. Dotson (contact@jmdots.com)
@@ -24,8 +25,9 @@ Cryorithm™ | Managers | Job
 # SOFTWARE.
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-import asyncio
 from apscheduler.triggers.cron import CronTrigger
+
+from cryorithm.managers.log import LogManager
 
 
 class JobManager:
@@ -45,7 +47,7 @@ class JobManager:
             managing cron-based job scheduling.
     """
 
-    def __init__(self, sensors: list, log_manager: "LogManager"):
+    def __init__(self, sensors: list, log_manager: LogManager):
         """
         Initializes the JobManager with sensor data and a LogManager instance.
 
@@ -73,12 +75,14 @@ class JobManager:
         for sensor in self.sensors:
             trigger = CronTrigger(cron=sensor.schedule_time)
             self.scheduler.add_job(self.job, trigger, args=[sensor])
-            self.log_manager.info(f"Scheduled job for {sensor.name} with cron: {sensor.schedule_time}")
+            self.log_manager.info(
+                f"Scheduled job for {sensor.name} with cron: {sensor.schedule_time}",
+            )
 
         await self.scheduler.start()
 
     @staticmethod
-    async def job(sensor):
+    async def job(self, sensor):
         """
         Asynchronous job function to fetch data from a sensor.
 
@@ -101,7 +105,8 @@ class JobManager:
             data = await sensor.fetch_data()
             if data:
                 self.log_manager.info(f"Data fetched from {sensor.name}: {data}")
-                # Further process or forward this data according to your application needs.
+                # Further process or forward this data according to your application
+                # needs.
 
         except Exception as e:
             self.log_manager.error(f"Error fetching data from {sensor.name}: {str(e)}")

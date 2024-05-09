@@ -31,7 +31,8 @@ from pathlib import Path
 
 class ConfigManager:
     def __init__(self):
-        # Initialize with default settings except for 'api_key' since it should only come from config file.
+        # Initialize with default settings except for 'api_key' since it should only
+        # come from config file.
         self.config = {
             "kafka_bootstrap_servers": "localhost:9902",
             "kafka_topic": "cryorithm",
